@@ -1,7 +1,7 @@
 services:
   lb2lidarr:
     build: .
-    container_name: lb2lidarr
+    container_name: jabebop/lb2lidarr:latest
     restart: unless-stopped
     environment:
       - CRON_SCHEDULE=${CRON_SCHEDULE:-0 */6 * * *}
