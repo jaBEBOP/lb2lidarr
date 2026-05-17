@@ -163,8 +163,8 @@ def process_all(dry_run: bool = False) -> None:
         existing_album = lidarr.get_cached_album(rg_mbid)
 
         if existing_album:
-            lidarr._handle_existing_album(existing_album)
-            stats["searched_albums"] += 1
+            if lidarr._handle_existing_album(existing_album):
+                stats["searched_albums"] += 1
             continue
 
         album = lidarr.add_album(artist_id, rg_mbid, artist)

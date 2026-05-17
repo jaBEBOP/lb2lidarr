@@ -287,8 +287,11 @@ def search_album(album_id: int) -> bool:
     return False
 
 
-def _handle_existing_album(existing: dict) -> dict:
-    """Ensure an existing album is monitored and searched if it has no files."""
+def _handle_existing_album(existing: dict) -> bool:
+    """Ensure an existing album is monitored and search it if it has no files.
+
+    Returns True if a search was triggered, False if skipped (files exist).
+    """
     if not existing.get("monitored"):
         existing = monitor_album(existing) or existing
 
@@ -296,11 +299,12 @@ def _handle_existing_album(existing: dict) -> dict:
     title = _album_title(existing)
     if track_files > 0:
         logger.debug(f"'{title}' already has {track_files} file(s) — skipping search")
+        return False
     else:
         logger.info(f"'{title}' has no downloaded tracks — triggering search")
         if existing.get("id"):
             search_album(existing["id"])
-    return existing
+        return True
 
 
 def add_album(artist_id: int, rg_mbid: str, artist: dict) -> Optional[dict]:
@@ -349,7 +353,8 @@ def add_album(artist_id: int, rg_mbid: str, artist: dict) -> Optional[dict]:
     # POST failed — fetch directly and handle (monitors + searches if no files)
     existing = get_album_by_foreign_id(rg_mbid)
     if existing:
-        return _handle_existing_album(existing)
+        _handle_existing_album(existing)
+        return existing
 
     logger.error(f"Failed to add album {rg_mbid}")
     return None
