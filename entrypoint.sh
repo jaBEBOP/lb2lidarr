@@ -16,11 +16,11 @@ echo "  PGID     : ${PGID}"
 addgroup -g "${PGID}" appgroup 2>/dev/null || true
 adduser  -D -u "${PUID}" -G appgroup appuser 2>/dev/null || true
 
-echo "${CRON_SCHEDULE} python /app/src/lb2lidarr.py 2>&1" > "${CRONTAB_FILE}"
+echo "${CRON_SCHEDULE} python /app/lb2lidarr.py 2>&1" > "${CRONTAB_FILE}"
 chown appuser:appgroup "${CRONTAB_FILE}"
 
 echo "Running initial execution..."
-su-exec appuser python /app/src/lb2lidarr.py
+su-exec appuser python /app/lb2lidarr.py
 
 echo "Starting cron scheduler..."
 exec su-exec appuser supercronic "${CRONTAB_FILE}"
