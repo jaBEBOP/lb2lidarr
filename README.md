@@ -1,6 +1,7 @@
 # lb2lidarr
 
 Syncs artists and albums from ListenBrainz "Created For You" playlist tracks to Lidarr.
+Generated with Claude Sonnet 4.6
 
 ## Quick start
 
@@ -36,3 +37,4 @@ services:
 | `ENABLE_RATE_LIMITING` | `true` | Disable if using local MusicBrainz |
 | `ARTIST_INDEX_POLL_INTERVAL` | `5` | Seconds between artist indexing polls |
 | `ARTIST_INDEX_TIMEOUT` | `300` | Max seconds to wait for artist indexing |
+
