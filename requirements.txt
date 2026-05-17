@@ -1,0 +1,4 @@
+requests==2.32.3
+urllib3==2.2.3
+python-dotenv==1.0.1
+urllib3[secure]==2.2.3
