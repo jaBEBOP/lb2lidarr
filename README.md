@@ -1,6 +1,6 @@
 # lb2lidarr
 
-Syncs artists and albums from ListenBrainz "Created For You" playlist tracks to Lidarr.
+Syncs artists and albums from ListenBrainz "Created For You" playlist tracks to Lidarr.  
 Generated with Claude Sonnet 4.6
 
 ## Quick start
@@ -9,7 +9,7 @@ Generated with Claude Sonnet 4.6
 # docker-compose.yml
 services:
   lb2lidarr:
-    image: yourusername/lb2lidarr:latest
+    image: jabebop/lb2lidarr:latest
     container_name: lb2lidarr
     restart: unless-stopped
     environment:
