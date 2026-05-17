@@ -1,7 +1,15 @@
 # lb2lidarr
 
 Syncs artists and albums from ListenBrainz "Created For You" playlist tracks to Lidarr.  
-Generated with Claude Sonnet 4.6
+Generated with Claude Sonnet 4.6  
+
+My setup consists of:  
+[Navidrome](https://www.navidrome.org/)  
+[Navidrome ListenBrainz Daily Playlist Importer](https://github.com/kgarner7/navidrome-listenbrainz-daily-playlist)  
+[LinuxServer's lidarr:nightly](https://docs.linuxserver.io/images/docker-lidarr/)  
+[Tubifarry for Lidarr](https://github.com/TypNull/Tubifarry)  
+[hearring-aid](https://github.com/blampe/hearring-aid)  
+[slskd](https://github.com/slskd/slskd)  
 
 ## Quick start
 
