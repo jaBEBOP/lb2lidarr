@@ -4,7 +4,7 @@ Syncs artists and albums from ListenBrainz "Created For You" playlist tracks to 
 
 ## Quick start
 
-\```yaml
+```yaml
 # docker-compose.yml
 services:
   lb2lidarr:
@@ -18,7 +18,7 @@ services:
       - LIDARR_URL=http://192.168.1.100:8686
       - LIDARR_API_KEY=your_api_key
       - LIDARR_ROOT_FOLDER=/music
-\```
+```
 
 ## All environment variables
 
