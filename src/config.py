@@ -77,8 +77,8 @@ def load() -> bool:
     global MAX_PARALLEL_REQUESTS, REQUEST_TIMEOUT
     global ARTIST_INDEX_POLL_INTERVAL, ARTIST_INDEX_TIMEOUT
 
-    LISTENBRAINZ_USERS  = [u.strip() for u in os.getenv("LB_USERS",  "").split(",") if u.strip()]
-    LISTENBRAINZ_TOKENS = [t.strip() for t in os.getenv("LB_TOKENS", "").split(",") if t.strip()]
+    LISTENBRAINZ_USERS  = [u.strip() for u in os.getenv("LISTENBRAINZ_USERS",  "").split(",") if u.strip()]
+    LISTENBRAINZ_TOKENS = [t.strip() for t in os.getenv("LISTENBRAINZ_TOKENS", "").split(",") if t.strip()]
 
     ENABLE_RECOMMENDATIONS = os.getenv("ENABLE_RECOMMENDATIONS", "true").lower() == "true"
     RECOMMENDATION_COUNT   = int(os.getenv("RECOMMENDATION_COUNT", "100"))
@@ -121,10 +121,10 @@ def validate() -> bool:
         logger.error(f"Missing required environment variables: {', '.join(missing)}")
         return False
     if not LISTENBRAINZ_USERS or not LISTENBRAINZ_TOKENS:
-        logger.error("No ListenBrainz users/tokens configured (LB_USERS, LB_TOKENS)")
+        logger.error("No ListenBrainz users/tokens configured (LISTENBRAINZ_USERS, LISTENBRAINZ_TOKENS)")
         return False
     if len(LISTENBRAINZ_USERS) != len(LISTENBRAINZ_TOKENS):
-        logger.error("LB_USERS and LB_TOKENS must have the same number of entries")
+        logger.error("LISTENBRAINZ_USERS and LISTENBRAINZ_TOKENS must have the same number of entries")
         return False
     return True
 

@@ -22,8 +22,8 @@ services:
     restart: unless-stopped
     environment:
       - CRON_SCHEDULE=0 */6 * * *
-      - LB_USERS=user1,user2
-      - LB_TOKENS=token1,token2
+      - LISTENBRAINZ_USERS=user1,user2
+      - LISTENBRAINZ_TOKENS=token1,token2
       - LIDARR_URL=http://192.168.1.100:8686
       - LIDARR_API_KEY=your_api_key
       - LIDARR_ROOT_FOLDER=/music
@@ -34,8 +34,8 @@ services:
 | Variable | Default | Description |
 |---|---|---|
 | `CRON_SCHEDULE` | `0 */6 * * *` | How often to run |
-| `LB_USERS` | required | Comma-separated ListenBrainz usernames |
-| `LB_TOKENS` | required | Matching ListenBrainz API tokens |
+| `LISTENBRAINZ_USERS` | required | Comma-separated ListenBrainz usernames |
+| `LISTENBRAINZ_TOKENS` | required | Matching ListenBrainz API tokens |
 | `LIDARR_URL` | required | Lidarr base URL |
 | `LIDARR_API_KEY` | required | Lidarr API key |
 | `LIDARR_ROOT_FOLDER` | required | Music root folder path |
