@@ -153,6 +153,9 @@ def get_recommendations(username: str, token: str, count: int = 100) -> List[dic
 
     logger.info(f"Fetched {len(tracks)} recommendation(s) for {username}")
     return tracks
+
+
+def extract_track_metadata(track: dict) -> dict:
     """Pull MusicBrainz IDs and basic info from a JSPF track object."""
     identifiers = track.get("identifier", [])
     recording_mbid = mbid_from_url(identifiers[0]) if identifiers else None
