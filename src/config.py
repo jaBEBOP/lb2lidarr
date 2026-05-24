@@ -22,6 +22,12 @@ logger = logging.getLogger("lb2lidarr.config")
 LISTENBRAINZ_USERS: List[str] = []
 LISTENBRAINZ_TOKENS: List[str] = []
 
+# Collaborative filtering recommendations
+# Set to False to disable the recommendations source entirely
+ENABLE_RECOMMENDATIONS: bool = True
+# How many recommended recordings to fetch per user (max 1000 per API call)
+RECOMMENDATION_COUNT: int = 100
+
 # ---------------------------------------------------------------------------
 # Lidarr
 # ---------------------------------------------------------------------------
@@ -63,6 +69,7 @@ def load() -> bool:
     load_dotenv()
 
     global LISTENBRAINZ_USERS, LISTENBRAINZ_TOKENS
+    global ENABLE_RECOMMENDATIONS, RECOMMENDATION_COUNT
     global LIDARR_URL, LIDARR_API_KEY, LIDARR_ROOT_FOLDER
     global LIDARR_QUALITY_PROFILE_ID, LIDARR_METADATA_PROFILE_ID
     global MUSICBRAINZ_URL, USE_LOCAL_MUSICBRAINZ, LOCAL_MUSICBRAINZ_URL
@@ -72,6 +79,9 @@ def load() -> bool:
 
     LISTENBRAINZ_USERS  = [u.strip() for u in os.getenv("LB_USERS",  "").split(",") if u.strip()]
     LISTENBRAINZ_TOKENS = [t.strip() for t in os.getenv("LB_TOKENS", "").split(",") if t.strip()]
+
+    ENABLE_RECOMMENDATIONS = os.getenv("ENABLE_RECOMMENDATIONS", "true").lower() == "true"
+    RECOMMENDATION_COUNT   = int(os.getenv("RECOMMENDATION_COUNT", "100"))
 
     LIDARR_URL                 = os.getenv("LIDARR_URL", "").rstrip("/")
     LIDARR_API_KEY             = os.getenv("LIDARR_API_KEY", "")
@@ -121,8 +131,10 @@ def validate() -> bool:
 
 def summary() -> str:
     """Return a human-readable config summary for startup logging."""
+    rec_status = f"enabled ({RECOMMENDATION_COUNT} per user)" if ENABLE_RECOMMENDATIONS else "disabled"
     return "\n".join([
         f"  ListenBrainz users   : {len(LISTENBRAINZ_USERS)}",
+        f"  Recommendations      : {rec_status}",
         f"  Lidarr URL           : {LIDARR_URL}",
         f"  Lidarr root folder   : {LIDARR_ROOT_FOLDER}",
         f"  MusicBrainz server   : {MUSICBRAINZ_URL}",

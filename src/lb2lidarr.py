@@ -61,6 +61,14 @@ def process_all(dry_run: bool = False) -> None:
             stats["total_tracks"] += len(tracks)
             all_tracks.extend(listenbrainz.extract_track_metadata(t) for t in tracks)
 
+        # Collaborative filtering recommendations
+        if config.ENABLE_RECOMMENDATIONS:
+            rec_tracks = listenbrainz.get_recommendations(
+                user, token, count=config.RECOMMENDATION_COUNT
+            )
+            stats["total_tracks"] += len(rec_tracks)
+            all_tracks.extend(rec_tracks)
+
     logger.info(f"Collected {len(all_tracks)} tracks from all users")
     if not all_tracks:
         logger.info("No tracks to process")

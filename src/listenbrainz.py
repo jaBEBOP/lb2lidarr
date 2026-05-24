@@ -109,7 +109,50 @@ def get_playlist_tracks(mbid: str, token: str) -> List[dict]:
     return resp.json().get("playlist", {}).get("track", [])
 
 
-def extract_track_metadata(track: dict) -> dict:
+def get_recommendations(username: str, token: str, count: int = 100) -> List[dict]:
+    """Fetch collaborative filtering recommendations for *username*.
+
+    Returns a list of track metadata dicts in the same shape as
+    extract_track_metadata() so they feed directly into the resolution pipeline.
+
+    Handles 204 No Content (recommendations not yet generated) gracefully.
+    """
+    url = f"https://api.listenbrainz.org/1/cf/recommendation/user/{username}/recording"
+    _rate_limiter.wait()
+    try:
+        resp = _session.get(
+            url,
+            headers={"Authorization": f"Token {token}"},
+            params={"count": count, "offset": 0},
+            timeout=config.REQUEST_TIMEOUT,
+        )
+
+        if resp.status_code == 204:
+            logger.info(f"No recommendations available yet for {username}")
+            return []
+
+        resp.raise_for_status()
+
+    except requests.RequestException as exc:
+        logger.error(f"Failed to fetch recommendations for {username}: {exc}")
+        return []
+
+    mbids = resp.json().get("payload", {}).get("mbids", [])
+    tracks = [
+        {
+            "recording_mbid": entry.get("recording_mbid"),
+            "release_mbid":   None,
+            "artist_mbids":   None,
+            "title":          None,
+            "artist_name":    None,
+            "_source":        "recommendation",
+        }
+        for entry in mbids
+        if entry.get("recording_mbid")
+    ]
+
+    logger.info(f"Fetched {len(tracks)} recommendation(s) for {username}")
+    return tracks
     """Pull MusicBrainz IDs and basic info from a JSPF track object."""
     identifiers = track.get("identifier", [])
     recording_mbid = mbid_from_url(identifiers[0]) if identifiers else None
