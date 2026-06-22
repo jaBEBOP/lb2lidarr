@@ -36,6 +36,7 @@ services:
 | `CRON_SCHEDULE` | `0 */6 * * *` | How often to run |
 | `LISTENBRAINZ_USERS` | required | Comma-separated ListenBrainz usernames |
 | `LISTENBRAINZ_TOKENS` | required | Matching ListenBrainz API tokens |
+| `ADDITIONAL_PLAYLISTS` | _(none)_ | Extra LB playlist types to fetch, comma-separated (e.g. `weekly-exploration`). Always includes `weekly-jams`, `daily-jams` |
 | `LIDARR_URL` | required | Lidarr base URL |
 | `LIDARR_API_KEY` | required | Lidarr API key |
 | `LIDARR_ROOT_FOLDER` | required | Music root folder path |

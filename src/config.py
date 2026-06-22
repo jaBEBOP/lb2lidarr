@@ -22,11 +22,12 @@ logger = logging.getLogger("lb2lidarr.config")
 LISTENBRAINZ_USERS: List[str] = []
 LISTENBRAINZ_TOKENS: List[str] = []
 
-# Collaborative filtering recommendations
-# Set to False to disable the recommendations source entirely
-ENABLE_RECOMMENDATIONS: bool = True
-# How many recommended recordings to fetch per user (max 1000 per API call)
-RECOMMENDATION_COUNT: int = 100
+# Default playlist types always fetched (the ones ListenBrainz auto-generates
+# on a recurring schedule)
+DEFAULT_PLAYLIST_TYPES = {"weekly-jams", "daily-jams"}
+# Additional playlist types to fetch, on top of the defaults above
+# (e.g. weekly-exploration, which isn't fetched by default)
+ADDITIONAL_PLAYLISTS: List[str] = []
 
 # ---------------------------------------------------------------------------
 # Lidarr
@@ -69,7 +70,7 @@ def load() -> bool:
     load_dotenv()
 
     global LISTENBRAINZ_USERS, LISTENBRAINZ_TOKENS
-    global ENABLE_RECOMMENDATIONS, RECOMMENDATION_COUNT
+    global ADDITIONAL_PLAYLISTS
     global LIDARR_URL, LIDARR_API_KEY, LIDARR_ROOT_FOLDER
     global LIDARR_QUALITY_PROFILE_ID, LIDARR_METADATA_PROFILE_ID
     global MUSICBRAINZ_URL, USE_LOCAL_MUSICBRAINZ, LOCAL_MUSICBRAINZ_URL
@@ -80,8 +81,9 @@ def load() -> bool:
     LISTENBRAINZ_USERS  = [u.strip() for u in os.getenv("LISTENBRAINZ_USERS",  "").split(",") if u.strip()]
     LISTENBRAINZ_TOKENS = [t.strip() for t in os.getenv("LISTENBRAINZ_TOKENS", "").split(",") if t.strip()]
 
-    ENABLE_RECOMMENDATIONS = os.getenv("ENABLE_RECOMMENDATIONS", "true").lower() == "true"
-    RECOMMENDATION_COUNT   = int(os.getenv("RECOMMENDATION_COUNT", "100"))
+    ADDITIONAL_PLAYLISTS = [
+        p.strip() for p in os.getenv("ADDITIONAL_PLAYLISTS", "").split(",") if p.strip()
+    ]
 
     LIDARR_URL                 = os.getenv("LIDARR_URL", "").rstrip("/")
     LIDARR_API_KEY             = os.getenv("LIDARR_API_KEY", "")
@@ -131,10 +133,10 @@ def validate() -> bool:
 
 def summary() -> str:
     """Return a human-readable config summary for startup logging."""
-    rec_status = f"enabled ({RECOMMENDATION_COUNT} per user)" if ENABLE_RECOMMENDATIONS else "disabled"
+    all_types = sorted(DEFAULT_PLAYLIST_TYPES | set(ADDITIONAL_PLAYLISTS))
     return "\n".join([
         f"  ListenBrainz users   : {len(LISTENBRAINZ_USERS)}",
-        f"  Recommendations      : {rec_status}",
+        f"  Playlist types       : {', '.join(all_types)}",
         f"  Lidarr URL           : {LIDARR_URL}",
         f"  Lidarr root folder   : {LIDARR_ROOT_FOLDER}",
         f"  MusicBrainz server   : {MUSICBRAINZ_URL}",

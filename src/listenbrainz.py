@@ -17,8 +17,6 @@ logger = logging.getLogger("lb2lidarr.listenbrainz")
 _session: requests.Session = create_session()
 _rate_limiter: RateLimiter = RateLimiter()
 
-ALLOWED_PLAYLIST_TYPES = {"weekly-exploration", "weekly-jams", "daily-jams"}
-
 
 def reinit(pool_size: int, rate_limiter: RateLimiter) -> None:
     """Recreate the session and rate limiter after config is loaded."""
@@ -47,7 +45,13 @@ def mbid_from_url(url: str) -> Optional[str]:
 # Public API
 # ---------------------------------------------------------------------------
 def get_created_for_you_playlists(username: str, token: str) -> List[dict]:
-    """Return the most-recent playlist of each allowed type for *username*."""
+    """Return the most-recent playlist of each allowed type for *username*.
+
+    Allowed types = config.DEFAULT_PLAYLIST_TYPES (the ones ListenBrainz
+    auto-generates) plus any extra types set via ADDITIONAL_PLAYLISTS.
+    """
+    allowed_types = config.DEFAULT_PLAYLIST_TYPES | set(config.ADDITIONAL_PLAYLISTS)
+
     url = f"https://api.listenbrainz.org/1/user/{username}/playlists/createdfor"
     _rate_limiter.wait()
     try:
@@ -73,7 +77,7 @@ def get_created_for_you_playlists(username: str, token: str) -> List[dict]:
         meta   = jspf.get("additional_metadata", {})
         patch  = meta.get("algorithm_metadata", {}).get("source_patch")
 
-        if patch not in ALLOWED_PLAYLIST_TYPES:
+        if patch not in allowed_types:
             continue
 
         # ListenBrainz returns newest-first; keep only the first of each type.
@@ -107,52 +111,6 @@ def get_playlist_tracks(mbid: str, token: str) -> List[dict]:
         return []
 
     return resp.json().get("playlist", {}).get("track", [])
-
-
-def get_recommendations(username: str, token: str, count: int = 100) -> List[dict]:
-    """Fetch collaborative filtering recommendations for *username*.
-
-    Returns a list of track metadata dicts in the same shape as
-    extract_track_metadata() so they feed directly into the resolution pipeline.
-
-    Handles 204 No Content (recommendations not yet generated) gracefully.
-    """
-    url = f"https://api.listenbrainz.org/1/cf/recommendation/user/{username}/recording"
-    _rate_limiter.wait()
-    try:
-        resp = _session.get(
-            url,
-            headers={"Authorization": f"Token {token}"},
-            params={"count": count, "offset": 0},
-            timeout=config.REQUEST_TIMEOUT,
-        )
-
-        if resp.status_code == 204:
-            logger.info(f"No recommendations available yet for {username}")
-            return []
-
-        resp.raise_for_status()
-
-    except requests.RequestException as exc:
-        logger.error(f"Failed to fetch recommendations for {username}: {exc}")
-        return []
-
-    mbids = resp.json().get("payload", {}).get("mbids", [])
-    tracks = [
-        {
-            "recording_mbid": entry.get("recording_mbid"),
-            "release_mbid":   None,
-            "artist_mbids":   None,
-            "title":          None,
-            "artist_name":    None,
-            "_source":        "recommendation",
-        }
-        for entry in mbids
-        if entry.get("recording_mbid")
-    ]
-
-    logger.info(f"Fetched {len(tracks)} recommendation(s) for {username}")
-    return tracks
 
 
 def extract_track_metadata(track: dict) -> dict:
