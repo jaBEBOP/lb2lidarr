@@ -46,4 +46,5 @@ services:
 | `ENABLE_RATE_LIMITING` | `true` | Disable if using local MusicBrainz |
 | `ARTIST_INDEX_POLL_INTERVAL` | `5` | Seconds between artist indexing polls |
 | `ARTIST_INDEX_TIMEOUT` | `300` | Max seconds to wait for artist indexing |
+| `ARTIST_INDEX_TIMEOUT_ENABLED` | `true` | Set to `false` to wait indefinitely instead of timing out |
 

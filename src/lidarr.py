@@ -176,11 +176,17 @@ def prefetch_artists() -> int:
 
 
 def wait_for_artist_indexing(poll_interval: int = None, timeout: int = None) -> bool:
-    """Poll until all RefreshArtist commands finish. Returns False if timeout hit."""
-    poll_interval = poll_interval or config.ARTIST_INDEX_POLL_INTERVAL
-    timeout       = timeout       or config.ARTIST_INDEX_TIMEOUT
-    deadline      = time.time() + timeout
-    logged        = False
+    """Poll until all RefreshArtist commands finish.
+
+    If config.ARTIST_INDEX_TIMEOUT_ENABLED is False, polls indefinitely until
+    indexing completes — no deadline is applied. Returns False only if a
+    timeout was enabled and got hit; otherwise returns True.
+    """
+    poll_interval  = poll_interval or config.ARTIST_INDEX_POLL_INTERVAL
+    timeout_enabled = config.ARTIST_INDEX_TIMEOUT_ENABLED
+    timeout        = timeout or config.ARTIST_INDEX_TIMEOUT
+    deadline       = (time.time() + timeout) if timeout_enabled else float("inf")
+    logged         = False
 
     while time.time() < deadline:
         result = _request("GET", "/command")
